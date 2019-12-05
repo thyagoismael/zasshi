@@ -3,7 +3,7 @@
 # Install script
 #
 
-MAIN_DIRECTORY="$HOME/RawManga"
+MAIN_DIRECTORY="$HOME/Zasshi"
 LINKS_FILE="$MAIN_DIRECTORY/following.txt"
 
 create_directories(){
@@ -12,12 +12,13 @@ create_directories(){
   if test ! -f "$LINKS_FILE"
   then
     touch "$LINKS_FILE"
-    echo "# Here you can put links to your favorite mangas (only from rawmanga.top)" > $LINKS_FILE 
+    echo "# Here you can put links to your favorites" >> "$LINKS_FILE"
+    echo "# magazines or mangas (only from rawmanga.top)" >> "$LINKS_FILE"
   fi
 }
 
 # Check if it's already installed
-if type rawmanga > /dev/null &>2
+if type zasshi > /dev/null 2>&1
 then
   echo "Already installed"
 else

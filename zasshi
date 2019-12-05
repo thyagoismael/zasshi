@@ -2,24 +2,27 @@
 #
 # Autor: Thyago Ismael
 #
-# rawmanga: Tiny script to downloads raw mangas
+# zasshi : Tiny script to downloads raw mangas
 #
 
 
-MAIN_DIRECTORY="$HOME/RawManga"
+MAIN_DIRECTORY="$HOME/Zasshi"
 LINKS_FILE="$MAIN_DIRECTORY/following.txt"
 
 create_directories(){
-  test -d "$MAIN_DIRECTORY"     || mkdir -p "$MAIN_DIRECTORY"
+  test -d "$MAIN_DIRECTORY" || mkdir -p "$MAIN_DIRECTORY"
+
   if test ! -f "$LINKS_FILE"
   then
     touch "$LINKS_FILE"
-    echo "# Here you can put links to your favorite mangas (only from rawmanga.top)" > $LINKS_FILE 
+    echo "# Here you can put links to your favorites" >> "$LINKS_FILE"
+    echo "# magazines or mangas (only from rawmanga.top)" >> "$LINKS_FILE"
   fi
 }
 
 chooseManga(){
-  sed "/^#/ d; /^$/ d" $LINKS_FILE | fzf --prompt='Which manga? '
+  # Blank lines or with a leading # are ignored
+  sed "/^#/ d; /^ *$/ d" $LINKS_FILE | fzf --prompt='Which magazine? '
 }
 
 chooseChapter() {
@@ -28,7 +31,7 @@ chooseChapter() {
   CHAPTER=$(curl -s $LINK | grep "$LINK" | grep -v "class" |
     sed 's/[^"]*"// ; s/".*//' | # remove html syntax
     cut --delimiter '/' --fields 5 | # uses volume field
-    fzf --prompt='Which chapter? ')
+    fzf --prompt='Which volume? ')
 
   echo "$LINK/$CHAPTER"
 }
