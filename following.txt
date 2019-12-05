@@ -1,13 +1,19 @@
-# Here you can put link to your favorites mangas (only from rawmanga.top)
+# Here you can put links to your favorites
+# magazines or mangas (only from rawmanga.top)
 
-https://rawmanga.top/Detective_Conan
-https://rawmanga.top/Weekly-Shonen-Champion
-https://rawmanga.top/Weekly-Shonen-Sunday
-https://rawmanga.top/Jump-SQ
-https://rawmanga.top/Weekly-Young-Jump
+https://rawmanga.top/Big-Comic-Superior
+https://rawmanga.top/Disney-Fan
+https://rawmanga.top/Flash
+https://rawmanga.top/Friday
 https://rawmanga.top/Grand-Jump
+https://rawmanga.top/Jump-SQ
 https://rawmanga.top/Shounen-Jump-Plus
-https://rawmanga.top/Weekly-Young-Magazine
-https://rawmanga.top/Big-Comic-Spirits
-https://rawmanga.top/Weekly-Shonen-Jump
+https://rawmanga.top/Weekly-Famitsu
 https://rawmanga.top/Weekly-Morning
+https://rawmanga.top/Weekly-Shonen-Champion
+https://rawmanga.top/Weekly-Shonen-Jump
+https://rawmanga.top/Weekly-Shonen-Magazine
+https://rawmanga.top/Weekly-Shonen-Sunday
+https://rawmanga.top/Weekly-Young-Jump
+https://rawmanga.top/Weekly-Young-Magazine
+https://rawmanga.top/Young-Animal
