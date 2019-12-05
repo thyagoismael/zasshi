@@ -1,0 +1,29 @@
+#!/bin/bash
+#
+# Install script
+#
+
+MAIN_DIRECTORY="$HOME/RawManga"
+LINKS_FILE="$MAIN_DIRECTORY/following.txt"
+
+create_directories(){
+  test -d "$MAIN_DIRECTORY" || mkdir -pv "$MAIN_DIRECTORY"
+
+  if test ! -f "$LINKS_FILE"
+  then
+    touch "$LINKS_FILE"
+    echo "# Here you can put links to your favorite mangas (only from rawmanga.top)" > $LINKS_FILE 
+  fi
+}
+
+# Check if it's already installed
+if type rawmanga > /dev/null &>2
+then
+  echo "Already installed"
+else
+  cp -v rawmanga $HOME/.local/bin/
+
+  create_directories
+  cp following.txt $LINKS_FILE
+fi
+
