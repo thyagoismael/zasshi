@@ -1,0 +1,82 @@
+#!/bin/bash
+#
+# Autor: Thyago Ismael
+#
+# rawmanga: Tiny script to downloads raw mangas
+#
+
+
+MAIN_DIRECTORY="$HOME/RawManga"
+LINKS_FILE="$MAIN_DIRECTORY/following.txt"
+
+create_directories(){
+  test -d "$MAIN_DIRECTORY"     || mkdir -p "$MAIN_DIRECTORY"
+  if test ! -f "$LINKS_FILE"
+  then
+    touch "$LINKS_FILE"
+    echo "# Here you can put links to your favorite mangas (only from rawmanga.top)" > $LINKS_FILE 
+  fi
+}
+
+chooseManga(){
+  sed "/^#/ d; /^$/ d" $LINKS_FILE | fzf --prompt='Which manga? '
+}
+
+chooseChapter() {
+  LINK=$1
+
+  CHAPTER=$(curl -s $LINK | grep "$LINK" | grep -v "class" |
+    sed 's/[^"]*"// ; s/".*//' | # remove html syntax
+    cut --delimiter '/' --fields 5 | # uses volume field
+    fzf --prompt='Which chapter? ')
+
+  echo "$LINK/$CHAPTER"
+}
+
+downloadChapter(){
+  # $1 is the chapter link
+
+  NAME=$(cutName $1)
+  CHAPTER=$(cutChapter $1)
+
+  test -d "$MAIN_DIRECTORY/$NAME/$CHAPTER" || 
+    mkdir -p "$MAIN_DIRECTORY/$NAME/$CHAPTER"
+  cd "$MAIN_DIRECTORY/$NAME/$CHAPTER"
+
+  PAGE_NUMBER=1
+  BASE_URL="https://rawmanga.top/viewer/$NAME/$CHAPTER"
+
+  while wget -O "${NAME}_${CHAPTER}_$(tresDigitos $PAGE_NUMBER).jpeg" --quiet --continue "$BASE_URL/$PAGE_NUMBER"
+  do
+    echo -en "Pages: $PAGE_NUMBER\r"
+
+    PAGE_NUMBER=$(( PAGE_NUMBER+1 ))
+  done
+
+  echo "Complete! $PAGE_NUMBER pages downloaded."
+}
+
+tresDigitos(){
+  n=$1
+  test $1 -lt 100 && eval n="0$1"
+  test $1 -lt 10  && eval n="00$1"
+
+  echo $n
+}
+
+cutName(){
+  echo $1 | cut --delimiter '/' --fields 4
+}
+cutChapter(){
+  echo $1 | cut --delimiter '/' --fields 5
+}
+
+create_directories
+
+MANGA=$(chooseManga)
+test "$MANGA" || exit
+
+CHAPTER=$(chooseChapter $MANGA)
+test "$CHAPTER" || exit
+
+downloadChapter $CHAPTER
