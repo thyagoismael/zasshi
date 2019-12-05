@@ -22,7 +22,7 @@ if type zasshi > /dev/null 2>&1
 then
   echo "Already installed"
 else
-  cp -v rawmanga $HOME/.local/bin/
+  cp -v zasshi $HOME/.local/bin/
 
   create_directories
   cp following.txt $LINKS_FILE
