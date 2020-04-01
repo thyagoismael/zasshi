@@ -33,53 +33,93 @@ chooseChapter() {
     cut --delimiter '/' --fields 5 | # uses volume field
     fzf --prompt='Which volume? ')
 
+  test "$CHAPTER" || exit
   echo "$LINK/$CHAPTER"
 }
 
 downloadChapter(){
-  # $1 is the chapter link
+  # $1 is the chapter URL 
 
-  NAME=$(cutName $1)
-  CHAPTER=$(cutChapter $1)
+  NAME=$(cutField $1 4)
+  CHAPTER=$(cutField $1 5)
+  echo "$NAME $CHAPTER"
 
+  test "$1" || exit
   test -d "$MAIN_DIRECTORY/$NAME/$CHAPTER" || 
     mkdir -p "$MAIN_DIRECTORY/$NAME/$CHAPTER"
   cd "$MAIN_DIRECTORY/$NAME/$CHAPTER"
 
-  PAGE_NUMBER=1
   BASE_URL="https://rawmanga.top/viewer/$NAME/$CHAPTER"
 
-  while wget -O "${NAME}_${CHAPTER}_$(tresDigitos $PAGE_NUMBER).jpeg" --quiet --continue "$BASE_URL/$PAGE_NUMBER"
+  echo -n "Number of pages: "
+  NUMBER_OF_PAGES=$(countPages $BASE_URL)
+  echo "$NUMBER_OF_PAGES"
+
+  echo -n "Downloaded: "
+  PAGE_NUMBER=$(lastPageDownloaded "$MAIN_DIRECTORY/$NAME/$CHAPTER")
+  echo "$PAGE_NUMBER"
+
+  #echo -n "($NUMBER_OF_PAGES pages, $PAGE_NUMBER downloaded)"
+  while (( $PAGE_NUMBER <= $NUMBER_OF_PAGES ))
   do
-    echo -en "Pages: $PAGE_NUMBER\r"
+    progressBar $PAGE_NUMBER $NUMBER_OF_PAGES
+    wget -O "${NAME}_${CHAPTER}_$(threeDigits $PAGE_NUMBER).jpeg" --quiet --continue "$BASE_URL/$PAGE_NUMBER"
 
-    PAGE_NUMBER=$(( PAGE_NUMBER+1 ))
+    PAGE_NUMBER=$((PAGE_NUMBER + 1))
   done
-
-  echo "Complete! $PAGE_NUMBER pages downloaded."
+  echo -e "\nComplete!"
 }
 
-tresDigitos(){
+lastPageDownloaded(){
+  # It's dull, but it works
+  echo $1/* | tr ' ' '\n' | wc -w
+}
+
+threeDigits(){
   n=$1
-  test $1 -lt 100 && eval n="0$1"
-  test $1 -lt 10  && eval n="00$1"
+  test $1 -lt 100 && n="0$1"
+  test $1 -lt 10  && n="00$1"
 
   echo $n
 }
 
-cutName(){
-  echo $1 | cut --delimiter '/' --fields 4
+cutField(){
+  # $1 is the string
+  # $2 is the field number 
+  echo $1 | cut --delimiter '/' --fields $2
 }
-cutChapter(){
-  echo $1 | cut --delimiter '/' --fields 5
+
+countPages(){
+  # $1 = Base url
+  number=1
+  while [ $(curl -s "$1/$number" | grep -ic error) -eq 0 ]
+  do
+    number=$((number + 1))
+  done
+  echo $((number - 1))
+}
+
+progressBar() {
+  # Process data
+  let _progress=(${1}*100/${2}*100)/100
+  let _done=(${_progress}*4)/10
+  let _left=40-$_done
+  # Build progressbar string lengths
+  _fill=$(printf "%${_done}s")
+  _empty=$(printf "%${_left}s")
+
+  # Build progressbar strings and print the ProgressBar line
+  # Output example:                           
+  # Progress : [########################################] 100%
+  printf "\rProgress : [${_fill// /#}${_empty// /-}] ${_progress}%%"
 }
 
 create_directories
 
-MANGA=$(chooseManga)
-test "$MANGA" || exit
+TITLE=$(chooseManga)
+test "$TITLE" || exit
 
-CHAPTER=$(chooseChapter $MANGA)
+CHAPTER=$(chooseChapter $TITLE)
 test "$CHAPTER" || exit
 
-downloadChapter $CHAPTER
+downloadChapter "$CHAPTER"
